@@ -36,6 +36,12 @@ export function registerHooks(hookRunner) {
 		description: "Build isoq middleware."
 	});
 
-	hookRunner.on("worker-modules",onWorkerModules)
-	hookRunner.on("hono-middlewares",onHonoMiddlewares);
+	hookRunner.on("worker-modules",onWorkerModules,{
+		description: "Add isoq worker modules."
+	});
+
+	hookRunner.on("hono-middlewares",onHonoMiddlewares,{
+		description: "Add isoq hono middleware.",
+		priority: 20
+	});
 }

@@ -1,0 +1,14 @@
+{
+  "name": "katnip-tailwind",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "type": "module",
+  "keywords": [
+    "katnip-cli"
+  ],
+  "dependencies": {
+    "find-node-modules": "^2.1.3",
+    "tailwindcss": "^3.4.0"
+  }
+}

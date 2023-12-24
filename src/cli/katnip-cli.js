@@ -18,7 +18,7 @@ if (argv._.length!=1) {
 	console.log();
     let listenersByEvent=hookRunner.getListenersByEvent();
     for (let event in listenersByEvent) {
-        if (!hookRunner.internal.includes(event)) {
+        if (argv.all || !hookRunner.internal.includes(event)) {
             console.log("  "+event+":");
             for (let listener of listenersByEvent[event])
                 console.log("    - ["+listener.priority+"] "+listener.description);

@@ -1,0 +1,13 @@
+{
+  "name": "katnip-hono-quickmin",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "type": "module",
+  "keywords": [
+    "katnip-cli"
+  ],
+  "dependencies": {
+    "quickmin": "^0.0.16"
+  }
+}
