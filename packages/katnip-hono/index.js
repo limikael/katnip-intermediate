@@ -4,6 +4,9 @@ import path from "path";
 import {fileURLToPath} from 'url';
 import fs from "fs";
 import {runCommand} from "./node-utils.js";
+import {Job} from "katnip";
+import {Worker} from "worker_threads";
+import {ResolvablePromise} from "./js-util.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -25,15 +28,33 @@ async function onDev(hookEvent) {
 	}
 
 	else {
-		const app=new Hono();
-		console.log("** Loading hono middlewares **");
+		let startedPromise=new ResolvablePromise();
+		let stoppedPromise=new ResolvablePromise();
+		let worker=new Worker(path.join(__dirname,"dev-node-worker.js"));
+		worker.on("message",(message)=>{
+			switch (message) {
+				case "started":
+					startedPromise.resolve();
+					break;
 
-		await hookEvent.hookRunner.emit("hono-middlewares",{
-			app: app
+				case "stopped":
+					worker.terminate();
+					stoppedPromise.resolve();
+					break;
+
+				default:
+					console.log("?? Got message from worker: "+message);
+					break;
+			}
 		});
 
-		serve(app,(info)=>{
-		    console.log(`Listening on http://localhost:${info.port}`)
+		await startedPromise;
+		//console.log("Worker started...");
+
+		return new Job(async ()=>{
+			//console.log("Stopping worker...");
+			worker.postMessage("stop");
+			await stoppedPromise;
 		});
 	}
 }

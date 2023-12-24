@@ -1,0 +1,13 @@
+{
+  "name": "katnip-watch",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "type": "module",
+  "keywords": [
+    "katnip-cli"
+  ],
+  "dependencies": {
+    "chokidar": "^3.5.3"
+  }
+}

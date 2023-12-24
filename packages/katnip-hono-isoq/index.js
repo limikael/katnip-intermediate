@@ -17,8 +17,10 @@ async function onBuild(hookEvent) {
 async function onHonoMiddlewares(hookEvent) {
 	let app=hookEvent.app;
 
+	//let modulePath=path.join(process.cwd(),"node_modules/__ISOQ_MIDDLEWARE/isoq-hono.js?random="+Math.random());
 	let modulePath=path.join(process.cwd(),"node_modules/__ISOQ_MIDDLEWARE/isoq-hono.js");
 	console.log("Loading isoq module: "+modulePath);
+
 	let isoqMiddleware=(await import(modulePath)).default;
 
 	app.use("*",isoqMiddleware({localFetch: app.fetch}));

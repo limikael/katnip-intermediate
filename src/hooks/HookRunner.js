@@ -39,6 +39,20 @@ export default class HookRunner {
 		return listeners;
 	}
 
+	async runListeners(listeners, event) {
+		let ret;
+		listeners=[...listeners];
+		for (let listener of listeners) {
+			listeners.shift();
+			event.remaining=listeners;
+			ret=await listener.func(event);
+			if (event.propagationStopped)
+				return;
+		}
+
+		return ret;
+	}
+
 	async emit(event, eventOptions) {
 		if (typeof event=="string")
 			event=new HookEvent(event, eventOptions);
@@ -47,8 +61,7 @@ export default class HookRunner {
 			if (eventOptions)
 				throw new Error("Event options only allowed if event is a string.");
 
-		for (let listener of this.getListenersForEvent(event.type)) {
-			await listener.func(event);
-		}
+		event.hookRunner=this;
+		await this.runListeners(this.getListenersForEvent(event.type),event);
 	}
 }

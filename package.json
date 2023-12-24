@@ -11,6 +11,7 @@
     "minimist": "^1.2.8"
   },
   "exports": {
-    "workerd": "./src/exports/katnip-workerd.js"
+    "workerd": "./src/exports/katnip-workerd.js",
+    "default": "./src/exports/katnip.js"
   }
 }
