@@ -6,7 +6,7 @@ import {loadHookRunner} from "katnip";
 import {parentPort} from "worker_threads";
 
 const app=new Hono();
-console.log("** Loading hono middlewares **");
+console.log("Loading hono middlewares...");
 
 let hookRunner=await loadHookRunner(process.cwd(),{keyword: "katnip-cli"});
 
@@ -18,7 +18,7 @@ let resolveStarted;
 let startedPromise=new Promise(r=>resolveStarted=r);
 
 let server=serve(app,(info)=>{
-    console.log(`Listening on http://localhost:${info.port}`)
+    console.log(`** Listening on http://localhost:${info.port}`)
     resolveStarted();
 });
 

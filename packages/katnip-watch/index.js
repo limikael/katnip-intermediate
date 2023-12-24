@@ -39,6 +39,7 @@ async function onDev(hookEvent) {
 	while (true) {
 		let job=await hookEvent.runRemaining();
 		await changePromise;
+		console.log();
 		console.log("Change detected...");
 		changePromise=new ResolvablePromise();
 
