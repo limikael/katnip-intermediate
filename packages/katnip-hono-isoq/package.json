@@ -1,0 +1,19 @@
+{
+  "name": "katnip-hono-isoq",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "type": "module",
+  "keywords": [
+    "katnip-cli"
+  ],
+  "dependencies": {
+    "isoq": "^1.0.5"
+  },
+  "exports": {
+    ".": {
+      "workerd": "./index-workerd.js",
+      "default": "./index.js"
+    }
+  }
+}

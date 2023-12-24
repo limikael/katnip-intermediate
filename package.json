@@ -1,0 +1,16 @@
+{
+  "name": "katnip",
+  "version": "1.0.0",
+  "bin": {
+    "katnip": "src/cli/katnip-cli.js"
+  },
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "find-node-modules": "^2.1.3",
+    "minimist": "^1.2.8"
+  },
+  "exports": {
+    "workerd": "./src/exports/katnip-workerd.js"
+  }
+}
