@@ -1,6 +1,6 @@
 {
   "name": "katnip-watch",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "index.js",
   "license": "MIT",
   "type": "module",
@@ -8,6 +8,7 @@
     "katnip-cli"
   ],
   "dependencies": {
-    "chokidar": "^3.5.3"
+    "chokidar": "^3.5.3",
+    "katnip": "^2.0.0"
   }
 }
