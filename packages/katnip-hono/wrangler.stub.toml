@@ -1,0 +1,6 @@
+name = "$$PROJECT_NAME$$"
+main = "worker.js"
+compatibility_date = "2023-10-30"
+
+[site]
+bucket = "../public"

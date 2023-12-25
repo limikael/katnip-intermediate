@@ -22,8 +22,8 @@ async function onDev(hookEvent) {
             "--config",".snapflow/worker/wrangler.toml",
         ],{passthrough: true});*/
 
-        await runCommand("wrangler",["dev",
-            ".target/worker.js",
+        await runCommand("wrangler",["dev", 
+        	"--config", ".target/wrangler.toml"
         ],{passthrough: true});
 	}
 
@@ -64,9 +64,12 @@ async function onBuild(hookEvent) {
 		console.log("Building worker...");
 
 		let workerModules={};
-		hookEvent.hookRunner.emit("worker-modules",{
+		await hookEvent.hookRunner.emit("worker-modules",{
 			workerModules: workerModules
 		});
+
+		console.log("Using worker modules:");
+		console.log(workerModules);
 
 		let workerModulesSource=[];
 		for (let k in workerModules)
@@ -79,6 +82,10 @@ async function onBuild(hookEvent) {
 
 		fs.mkdirSync(path.join(process.cwd(),".target"),{recursive: true});
 		fs.writeFileSync(path.join(process.cwd(),".target/worker.js"),workerSource);
+
+		let wrangler=fs.readFileSync(path.join(__dirname,"wrangler.stub.toml"),"utf8");
+		wrangler=wrangler.replace("$$PROJECT_NAME$$",hookEvent.packageJson.name);
+		fs.writeFileSync(path.join(process.cwd(),".target/wrangler.toml"),wrangler);
 	}
 }
 

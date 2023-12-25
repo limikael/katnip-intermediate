@@ -8,12 +8,12 @@
     "katnip-cli"
   ],
   "dependencies": {
-    "katnip-hono": "^1.0.0",
-    "katnip-hono-isoq": "^1.0.0",
-    "katnip-hono-quickmin": "^1.0.0",
-    "katnip-hono-static": "^1.0.0",
-    "katnip-tailwind": "^1.0.0",
-    "katnip-watch": "^1.0.0",
+    "katnip-hono": "^1.0.2",
+    "katnip-hono-isoq": "^1.0.2",
+    "katnip-hono-quickmin": "^1.0.1",
+    "katnip-hono-static": "^1.0.2",
+    "katnip-tailwind": "^1.0.1",
+    "katnip-watch": "^1.0.1",
     "katnip": "^2.0.0"
   }
 }

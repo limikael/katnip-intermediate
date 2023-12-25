@@ -1,14 +1,16 @@
+import {serveStatic} from "fullstack-utils/hono-cloudflare-content";
+
 async function onHonoMiddlewares(hookEvent) {
 	let isoqMiddleware=hookEvent.workerModules.isoqMiddleware;
 
 	let app=hookEvent.app;
 
-	app.use("*",isoqMiddleware.default({localFetch: app.fetch}));
+	app.use("*",serveStatic());
 }
 
 export function registerHooks(hookRunner) {
 	hookRunner.on("hono-middlewares",onHonoMiddlewares,{
-		description: "Add isoq hono middleware.",
-		priority: 20
+		priority: 5,
+		description: "Add hono middleware for static content."
 	})
 }
