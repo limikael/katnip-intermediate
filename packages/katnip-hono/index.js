@@ -13,11 +13,6 @@ import {DeclaredError} from "katnip";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 async function onDeploy(hookEvent) {
-	await hookEvent.hookRunner.emit("build",{
-		packageJson: hookEvent.packageJson,
-		platform: hookEvent.platform,
-	});
-
 	switch (hookEvent.platform) {
 		case "wrangler":
 	        await runCommand(
@@ -34,11 +29,6 @@ async function onDeploy(hookEvent) {
 }
 
 async function onDev(hookEvent) {
-	await hookEvent.hookRunner.emit("build",{
-		packageJson: hookEvent.packageJson,
-		platform: hookEvent.platform,
-	});
-
 	if (hookEvent.platform=="wrangler") {
         await runCommand(
         	"wrangler",
@@ -80,6 +70,15 @@ async function onDev(hookEvent) {
 }
 
 async function onEarlyBuild(hookEvent) {
+	if (!hookEvent.platform)
+		hookEvent.platform="node";
+
+	let supportedPlatforms=["node","wrangler"];
+	if (!supportedPlatforms.includes(hookEvent.platform))
+		throw new DeclaredError("Unknown platform: "+hookEvent.platform+", supported: "+supportedPlatforms);
+
+	console.log("Building for: "+hookEvent.platform);
+
 	if (hookEvent.platform=="wrangler") {
 		let wrangler={};
 		let wrangerPath=path.join(process.cwd(),"wrangler.toml");
@@ -137,19 +136,26 @@ async function onBuild(hookEvent) {
 export function registerHooks(hookRunner) {
 	hookRunner.internal.push("hono-middlewares","worker-modules");
 
+	hookRunner.sub("deploy","build");
 	hookRunner.on("deploy",onDeploy,{
-		description: "Run build, and deploy project."
+		description: "Deploy project.",
+		priority: 20,
+		options: {
+			platform: "Platform to deploy to."
+		}
 	});
 
+	hookRunner.sub("dev","build");
 	hookRunner.on("dev",onDev,{
-		description: "Run build, and start hono dev server."
+		description: "Start hono dev server.",
+		priority: 20
 	});
 
 	hookRunner.on("build",onEarlyBuild,{
 		description: "Check and update build settings.",
 		priority: 1,
-		optionDescriptions: {
-			platform: "Platform to deploy to."
+		options: {
+			platform: "Platform to build for."
 		}
 	});
 

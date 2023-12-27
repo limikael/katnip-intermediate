@@ -1,4 +1,6 @@
 import HookEvent from "./HookEvent.js";
+import {arrayUnique} from "../utils/js-util.js";
+import {listenerGetOptions, listenerGetOptionDescriptions} from "./listener-util.js";
 
 export default class HookRunner {
 	constructor() {
@@ -10,33 +12,62 @@ export default class HookRunner {
 		if (!options.description)
 			options.description="Unknown";
 
-		options={...options, event, func};
-		if (options.priority===undefined)
-			options.priority=10;
+		let listener={...options, event, func, hookRunner: this};
+		if (listener.priority===undefined)
+			listener.priority=10;
 
-		this.listeners.push(options);
+		this.listeners.push(listener);
 	}
 
-	getListenersByEvent() {
-		let listenersByEvent={};
-		for (let listener of this.listeners) {
-			if (!listenersByEvent[listener.event])
-				listenersByEvent[listener.event]=[];
+	sub(event, sub, options={}) {
+		let listener={...options, event, sub, hookRunner: this};
+		if (listener.priority===undefined)
+			listener.priority=10;
 
-			listenersByEvent[listener.event].push(listener);
-			listenersByEvent[listener.event].sort((a,b)=>a.priority-b.priority);
+		this.listeners.push(listener);
+	}
+
+	getEventTypes() {
+		let eventTypes=[];
+		for (let listener of this.listeners) {
+			if (!eventTypes.includes(listener.event))
+				eventTypes.push(listener.event);
 		}
 
-		return listenersByEvent;
+		return eventTypes;
 	}
 
-	getListenersForEvent(eventType) {
-		let listenersByEvent=this.getListenersByEvent();
-		let listeners=listenersByEvent[eventType];
-		if (!listeners)
-			listeners=[];
+	getListenersByEventType(eventType) {
+		let listeners=[];
+
+		for (let listener of this.listeners) {
+			if (listener.event==eventType)
+				listeners.push(listener);
+		}
+
+		listeners.sort((a,b)=>a.priority-b.priority);
 
 		return listeners;
+	}
+
+	getOptionsByEventType(eventType) {
+		let listeners=this.getListenersByEventType(eventType);
+		let options=[];
+
+		for (let listener of listeners)
+			options.push(...listenerGetOptions(listener));
+
+		return arrayUnique(options);
+	}
+
+	getOptionDescriptions(eventType,option) {
+		let listeners=this.getListenersByEventType(eventType);
+		let optionDescriptions=[];
+
+		for (let listener of listeners)
+			optionDescriptions.push(...listenerGetOptionDescriptions(listener,option));
+
+		return arrayUnique(optionDescriptions);
 	}
 
 	async runListeners(listeners, event) {
@@ -45,7 +76,15 @@ export default class HookRunner {
 		for (let listener of listeners) {
 			remainingListeners.shift();
 			event.remaining=remainingListeners;
-			ret=await listener.func(event);
+			if (listener.func)
+				ret=await listener.func(event);
+
+			else if (listener.sub)
+				await this.emit(listener.sub,event);
+
+			else
+				throw new Error("Not functional or sub?");
+
 			if (event.propagationStopped)
 				return;
 		}
@@ -64,6 +103,6 @@ export default class HookRunner {
 		//console.log("**** emit: "+event.type);
 
 		event.hookRunner=this;
-		await this.runListeners(this.getListenersForEvent(event.type),event);
+		await this.runListeners(this.getListenersByEventType(event.type),event);
 	}
 }

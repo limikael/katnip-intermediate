@@ -7,15 +7,16 @@ import {loadHookRunner} from "../hooks/hook-loader.js";
 import HookEvent from "../hooks/HookEvent.js";
 import {DeclaredError, jsonEq} from "../utils/js-util.js";
 import fs from "fs";
+import {listenerGetDescription} from "../hooks/listener-util.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 function printHookUsage(hookRunner, event) {
-    let listeners=hookRunner.getListenersForEvent(event);
+    let listeners=hookRunner.getListenersByEventType(event);
 
     console.log("  katnip "+event);
     for (let listener of listeners)
-        console.log("    - ["+listener.priority+"] "+listener.description);
+        console.log("    - ["+listener.priority+"] "+listenerGetDescription(listener));
 
     console.log();
 }
@@ -25,20 +26,20 @@ function printHookHelp(hookRunner, event) {
     console.log();
     printHookUsage(hookRunner,event);
 
-    let listeners=hookRunner.getListenersForEvent(event);
-    let optionDescriptions={};
-    for (let listener of listeners) {
-        if (listener.optionDescriptions) {
-            for (let k in listener.optionDescriptions) {
-                if (!optionDescriptions[k])
-                    optionDescriptions[k]=[];
+    let options=hookRunner.getOptionsByEventType(event);
+    if (options.length) {
+        console.log("Options:");
+        console.log();
 
-                optionDescriptions[k].push(listener.optionDescriptions[k]);
-            }
+        for (let option of options) {
+            console.log("  katnip "+event+" --"+option+"=<value>");
+            for (let desc of hookRunner.getOptionDescriptions(event,option))
+                console.log("    - "+desc);
+
+            console.log();
         }
-    }
 
-    console.log(optionDescriptions);
+    }
 }
 
 let booleanOptions=["help","version"];
@@ -61,10 +62,9 @@ if (argv._.length!=1 || jsonEq(argv._,["help"])) {
 	console.log("  katnip help <hook>");
     console.log("    - Show detailed help about a hook.");
 	console.log();
-    let listenersByEvent=hookRunner.getListenersByEvent();
-    for (let event in listenersByEvent) {
-        if (argv.all || !hookRunner.internal.includes(event)) {
-            printHookUsage(hookRunner,event);
+    for (let eventType of hookRunner.getEventTypes()) {
+        if (argv.all || !hookRunner.internal.includes(eventType)) {
+            printHookUsage(hookRunner,eventType);
         }
     }
     process.exit(1);
@@ -74,11 +74,21 @@ let packageJsonText=fs.readFileSync(path.join(process.cwd(),"package.json"),"utf
 let packageJson=JSON.parse(packageJsonText);
 
 try {
-    if (!hookRunner.getListenersForEvent(argv._[0]).length)
+    if (!hookRunner.getListenersByEventType(argv._[0]).length)
         throw new DeclaredError(`Command '${argv._[0]}' not understood.`);
 
+    let hookOptions={...argv};
+    delete hookOptions._;
+    delete hookOptions.help;
+    delete hookOptions.version;
+
+    let acceptedOptions=hookRunner.getOptionsByEventType(argv._[0]);
+    for (let option in hookOptions)
+        if (!acceptedOptions.includes(option))
+            throw new DeclaredError(`Option '${option}' not understood.`);
+
     await hookRunner.emit(new HookEvent(argv._[0],{
-        ...argv,
+        ...hookOptions,
         hookRunner: hookRunner,
         packageJson: packageJson
     }));    
