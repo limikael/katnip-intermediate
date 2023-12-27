@@ -1,10 +1,11 @@
 Todo:
-- options doc
-- set options in config
-- unpublish?
-- auto migrate
+x options doc
 - init/create
   - install deps
+- auto migrate
+- set options in config
+- unpublish?
+- client side hooks
 
 Conditional exports...
 
