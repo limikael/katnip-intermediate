@@ -147,7 +147,10 @@ export function registerHooks(hookRunner) {
 
 	hookRunner.on("build",onEarlyBuild,{
 		description: "Check and update build settings.",
-		priority: 1
+		priority: 1,
+		optionDescriptions: {
+			platform: "Platform to deploy to."
+		}
 	});
 
 	hookRunner.on("build",onBuild,{

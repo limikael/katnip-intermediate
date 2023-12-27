@@ -14,3 +14,7 @@ export class Job {
 		await this.stopper();
 	}
 }
+
+export function jsonEq(a,b) {
+	return (JSON.stringify(a)==JSON.stringify(b));
+}
