@@ -13,7 +13,8 @@ async function onDev(hookEvent) {
 	let ignored=[
 		"**/node_modules/**", "**/.git/**", "**/*.db*",
 		"**/.env", "**/package.json", "**/package-lock.json", "**/yarn.lock",
-		"**/katnip-cli.js","**/public","**/.target","**/.wrangler"
+		"**/katnip-cli.js","**/public","**/.target","**/.wrangler",
+		"**/wrangler.toml"
 	];
 
 	let watcher=chokidar.watch(watchDirs,{

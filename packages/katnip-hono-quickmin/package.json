@@ -1,6 +1,6 @@
 {
   "name": "katnip-hono-quickmin",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "main": "index.js",
   "license": "MIT",
   "type": "module",
@@ -8,7 +8,12 @@
     "katnip-cli"
   ],
   "dependencies": {
+    "@ltd/j-toml": "^1.38.0",
+    "katnip": "^2.0.2",
     "quickmin": "^0.0.16",
-    "katnip": "^2.0.0"
+    "wrangler": "^3.22.1"
+  },
+  "exports": {
+    "workerd": "./index-workerd.js"
   }
 }

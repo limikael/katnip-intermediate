@@ -5,6 +5,7 @@ import {fileURLToPath} from 'url';
 import minimist from "minimist";
 import {loadHookRunner} from "../hooks/hook-loader.js";
 import HookEvent from "../hooks/HookEvent.js";
+import {DeclaredError} from "../utils/js-util.js";
 import fs from "fs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -33,6 +34,9 @@ let packageJsonText=fs.readFileSync(path.join(process.cwd(),"package.json"),"utf
 let packageJson=JSON.parse(packageJsonText);
 
 try {
+    if (!hookRunner.getListenersForEvent(argv._[0]).length)
+        throw new DeclaredError(`Command '${argv._[0]}' not understood.`);
+
     await hookRunner.emit(new HookEvent(argv._[0],{
         ...argv,
         hookRunner: hookRunner,
