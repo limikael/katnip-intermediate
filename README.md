@@ -1,3 +1,11 @@
+Todo:
+- options doc
+- set options in config
+- unpublish?
+- auto migrate
+- init/create
+  - install deps
+
 Conditional exports...
 
 ref: 
