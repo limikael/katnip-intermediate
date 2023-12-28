@@ -69,6 +69,17 @@ async function onDev(hookEvent) {
 	}
 }
 
+async function onEarlyDeploy(hookEvent) {
+	if (!hookEvent.platform)
+		hookEvent.platform="node";
+
+	let supportedPlatforms=["wrangler"];
+	if (!supportedPlatforms.includes(hookEvent.platform))
+		throw new DeclaredError("Unknown platform: "+hookEvent.platform+", supported: "+supportedPlatforms);
+
+	console.log("Deploying to: "+hookEvent.platform);
+}
+
 async function onEarlyBuild(hookEvent) {
 	if (!hookEvent.platform)
 		hookEvent.platform="node";
@@ -135,6 +146,11 @@ async function onBuild(hookEvent) {
 
 export function registerHooks(hookRunner) {
 	hookRunner.internal.push("hono-middlewares","worker-modules");
+
+	hookRunner.on("deploy",onEarlyDeploy,{
+		description: "Check deploy settings.",
+		priority: 1,
+	});
 
 	hookRunner.sub("deploy","build");
 	hookRunner.on("deploy",onDeploy,{
