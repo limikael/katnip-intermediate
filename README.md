@@ -2,7 +2,7 @@ Todo:
 x options doc
 - init/create
   - install deps
-- auto migrate
+- auto migrate ... todo: wrangler local
 - set options in config
 - unpublish?
 - client side hooks

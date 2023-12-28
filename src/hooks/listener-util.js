@@ -19,7 +19,7 @@ export function listenerGetOptionDescriptions(listener, option) {
 	if (listener.sub)
 		return listener.hookRunner.getOptionDescriptions(listener.sub,option);
 
-	if (!listener.options)
+	if (!listener.options || !listener.options[option])
 		return [];
 
 	return [listener.options[option]];

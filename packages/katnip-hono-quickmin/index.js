@@ -95,6 +95,64 @@ async function onBuild(hookEvent) {
 	}
 }
 
+export async function onMigrate(hookEvent) {
+	let quickminBin=await findNodeBin(__dirname,"quickmin");
+
+	if (!hookEvent.platform)
+		hookEvent.platform="node";
+
+	let migrationTarget=hookEvent.type+":"+hookEvent.platform;
+	console.log("Schema migration: "+migrationTarget);
+
+	let quickminArgs=["migrate"];
+	if (hookEvent.risky)
+		quickminArgs.push("--risky");
+
+	switch (migrationTarget) {
+		case "dev:node":
+			await runCommand(quickminBin,quickminArgs,{passthrough: true});
+			break;
+
+		case "dev:wrangler":
+			await runCommand(quickminBin,[...quickminArgs,"--driver","wrangler-local"],{passthrough: true});
+			break;
+
+		case "deploy:wrangler":
+			await runCommand(quickminBin,[...quickminArgs,"--driver","wrangler"],{passthrough: true});
+			break;
+
+		default:
+			throw new Error("Unsupported migration target: "+migrationTarget);
+			break;
+	}
+
+	/*switch (hookEvent.type) {
+		case "dev":
+			switch (hookEvent.platform) {
+				case "node":
+					break;
+
+				default:
+			}
+			break;
+
+		case "deploy":
+			switch (hookEvent.platform) {
+				case "wrangler":
+					break;
+
+				default:
+
+					break;
+			}
+			break;
+
+		default:
+			throw new Error("Unknown event");
+			break;
+	}*/
+}
+
 export function registerHooks(hookRunner) {
 	hookRunner.on("hono-middlewares",onHonoMiddlewares,{
 		priority: 15,
@@ -107,5 +165,21 @@ export function registerHooks(hookRunner) {
 
 	hookRunner.on("build",onBuild,{
 		description: "Check database settings."
+	});
+
+	hookRunner.on("dev",onMigrate,{
+		description: "Migrate database schema.",
+		priority: 15,
+		options: {
+			risky: "Perform risky schema migration."
+		}
+	});
+
+	hookRunner.on("deploy",onMigrate,{
+		description: "Migrate database schema.",
+		priority: 15,
+		options: {
+			risky: "Perform risky schema migration."
+		}
 	});
 }
