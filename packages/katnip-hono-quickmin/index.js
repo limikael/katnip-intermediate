@@ -153,6 +153,28 @@ export async function onMigrate(hookEvent) {
 	}*/
 }
 
+const QUICKMIN_YAML=
+`
+jwtSecret: "changeme"
+adminUser: "admin"
+adminPass: "admin"
+apiPath: "admin"
+
+collections:
+  pages:
+    fields:
+      <Text id="title" listable/>
+      <RichText id="content"/>
+`;
+
+function onInit(hookEvent) {
+	let quickminYamlFile="quickmin.yaml";
+	if (!fs.existsSync(quickminYamlFile)) {
+		console.log("Creating "+quickminYamlFile);
+		fs.writeFileSync(quickminYamlFile,QUICKMIN_YAML);
+	}
+}
+
 export function registerHooks(hookRunner) {
 	hookRunner.on("hono-middlewares",onHonoMiddlewares,{
 		priority: 15,
@@ -181,5 +203,9 @@ export function registerHooks(hookRunner) {
 		options: {
 			risky: "Perform risky schema migration."
 		}
+	});
+
+	hookRunner.on("init",onInit,{
+		description: "Create quickmin.yaml"
 	});
 }

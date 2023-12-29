@@ -1,5 +1,6 @@
 import bundler from "isoq/bundler";
 import path from "path";
+import fs from "fs";
 
 async function onBuild(hookEvent) {
 	if (!hookEvent.packageJson.main) {
@@ -31,6 +32,29 @@ async function onWorkerModules(hookEvent) {
 	hookEvent.workerModules.isoqMiddleware="__ISOQ_MIDDLEWARE";
 }
 
+const INDEX_JSX=
+`export default function() {
+    return (<>
+        <div>Hello World</div>
+        <div>The project begins here...</div>
+    </>);
+}
+`;
+
+async function onInit(hookEvent) {
+	if (!hookEvent.packageJson.main) {
+		console.log("Setting main in package.json");
+		hookEvent.packageJson.main="src/main/index.jsx";
+		fs.writeFileSync("package.json",JSON.stringify(hookEvent.packageJson,null,2));
+	}
+
+	if (!fs.existsSync(hookEvent.packageJson.main)) {
+		console.log("Creating "+hookEvent.packageJson.main);
+		fs.mkdirSync(path.dirname(hookEvent.packageJson.main),{recursive: true});
+		fs.writeFileSync(hookEvent.packageJson.main,INDEX_JSX);
+	}
+}
+
 export function registerHooks(hookRunner) {
 	hookRunner.on("build",onBuild,{
 		description: "Build isoq middleware."
@@ -43,5 +67,9 @@ export function registerHooks(hookRunner) {
 	hookRunner.on("hono-middlewares",onHonoMiddlewares,{
 		description: "Add isoq hono middleware.",
 		priority: 20
+	});
+
+	hookRunner.on("init",onInit,{
+		description: "Create entry-point .jsx file."
 	});
 }
