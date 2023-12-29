@@ -71,7 +71,7 @@ async function onDev(hookEvent) {
 
 async function onEarlyDeploy(hookEvent) {
 	if (!hookEvent.platform)
-		hookEvent.platform="node";
+		hookEvent.platform="wrangler";
 
 	let supportedPlatforms=["wrangler"];
 	if (!supportedPlatforms.includes(hookEvent.platform))
