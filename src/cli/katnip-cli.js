@@ -74,15 +74,23 @@ async function createProject(argv) {
         GIT_IGNORE
     );
 
+    let templateDep="katnip-twentytwentyfour";
+    let pkgResponse=await fetch("https://registry.npmjs.org/"+templateDep+"/latest");
+    if (pkgResponse.status<200 || pkgResponse>=300)
+        throw new Error(await pkgResponse.text());
+
+    let pkgResult=await pkgResponse.json();
+    //console.log(pkgResult);
+
     let packageJson={
         name: projectName,
         license: "UNLICENSED",
         type: "module",
         version: "1.0.0",
-        dependencies: {
-            "katnip-twentytwentyfour": "^1.0.13"
-        }
+        dependencies: {}
     };
+
+    packageJson.dependencies[templateDep]="^"+pkgResult.version;
 
     fs.writeFileSync(
         path.join(projectDir,"package.json"),
