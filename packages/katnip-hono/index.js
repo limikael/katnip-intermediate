@@ -144,8 +144,41 @@ async function onBuild(hookEvent) {
 	}
 }
 
+export function onInit(hookEvent) {
+	let updated;
+
+	if (!hookEvent.packageJson.scripts) {
+		hookEvent.packageJson.scripts={};
+		updated=true;
+	}
+
+	if (!hookEvent.packageJson.scripts.start) {
+		hookEvent.packageJson.scripts.start="katnip dev";
+		updated=true;
+	}
+
+	if (!hookEvent.packageJson.scripts.dev) {
+		hookEvent.packageJson.scripts.dev="katnip dev";
+		updated=true;
+	}
+
+	if (!hookEvent.packageJson.scripts.deploy) {
+		hookEvent.packageJson.scripts.deploy="katnip deploy";
+		updated=true;
+	}
+
+	if (updated) {
+		console.log("Updating scripts in package.json...")
+		fs.writeFileSync("package.json",JSON.stringify(hookEvent.packageJson,null,2));
+	}
+}
+
 export function registerHooks(hookRunner) {
 	hookRunner.internal.push("hono-middlewares","worker-modules");
+
+	hookRunner.on("init",onInit,{
+		description: "Create package scripts."
+	});
 
 	hookRunner.on("deploy",onEarlyDeploy,{
 		description: "Check deploy settings.",

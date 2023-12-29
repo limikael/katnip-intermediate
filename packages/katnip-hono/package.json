@@ -1,6 +1,6 @@
 {
   "name": "katnip-hono",
-  "version": "1.0.6",
+  "version": "1.0.8",
   "main": "index.js",
   "license": "MIT",
   "type": "module",

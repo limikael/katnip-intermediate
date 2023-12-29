@@ -8,7 +8,7 @@ import HookEvent from "../hooks/HookEvent.js";
 import {DeclaredError, jsonEq} from "../utils/js-util.js";
 import fs from "fs";
 import {listenerGetDescription} from "../hooks/listener-util.js";
-
+import {runCommand} from "../utils/node-utils.js";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 function printHookUsage(hookRunner, event) {
@@ -42,62 +42,133 @@ function printHookHelp(hookRunner, event) {
     }
 }
 
+let GIT_IGNORE=
+`node_modules
+.target
+.wrangler
+public/*.css
+public/*.js
+upload
+*.db
+`;
+
+async function createProject(argv) {
+    if (argv._.length!=2) {
+        console.log("Usage:");
+        console.log();
+        console.log("  katnip create <project dir>");
+        console.log();
+        process.exit(1);
+    }
+
+    let projectName=argv._[1];
+    let projectDir=path.join(process.cwd(),projectName);
+    if (fs.existsSync(projectDir)) {
+        console.log("Already exists: "+projectDir);
+        process.exit(1);
+    }
+
+    fs.mkdirSync(projectDir);
+    fs.writeFileSync(
+        path.join(projectDir,".gitignore"),
+        GIT_IGNORE
+    );
+
+    let packageJson={
+        name: projectName,
+        license: "UNLICENSED",
+        type: "module",
+        version: "1.0.0",
+        dependencies: {
+            "katnip-twentytwentyfour": "^1.0.13"
+        }
+    };
+
+    fs.writeFileSync(
+        path.join(projectDir,"package.json"),
+        JSON.stringify(packageJson,null,2)
+    );
+
+    process.chdir(projectDir);
+    console.log("Created: "+projectDir);
+    console.log("Installing packages...");
+    await runCommand("npm",["install"],{stdio: "inherit"});
+    console.log("Running init hooks...");
+    await runHooks({_:["init"]});
+}
+
+async function runHooks(argv) {
+    let hookRunner=await loadHookRunner(process.cwd(),{keyword: "katnip-cli"});
+
+    if (argv._.length==2 && argv._[0]=="help") {
+        printHookHelp(hookRunner,argv._[1]);
+        process.exit(1);
+    }
+
+    if (argv._.length==1 && argv.help) {
+        printHookHelp(hookRunner,argv._[0])
+        process.exit(1);
+    }
+
+    if (argv._.length!=1 || jsonEq(argv._,["help"])) {
+        console.log("Usage:");
+        console.log();
+        console.log("  katnip help <hook>");
+        console.log("    - Show detailed help about a hook.");
+        console.log();
+        for (let eventType of hookRunner.getEventTypes()) {
+            if (argv.all || !hookRunner.internal.includes(eventType)) {
+                printHookUsage(hookRunner,eventType);
+            }
+        }
+        process.exit(1);
+    }
+
+    let packageJsonText=fs.readFileSync(path.join(process.cwd(),"package.json"),"utf8");
+    let packageJson=JSON.parse(packageJsonText);
+
+    try {
+        if (!hookRunner.getListenersByEventType(argv._[0]).length)
+            throw new DeclaredError(`Command '${argv._[0]}' not understood.`);
+
+        let hookOptions={...argv};
+        delete hookOptions._;
+        delete hookOptions.help;
+        delete hookOptions.version;
+
+        let acceptedOptions=hookRunner.getOptionsByEventType(argv._[0]);
+        for (let option in hookOptions)
+            if (!acceptedOptions.includes(option))
+                throw new DeclaredError(`Option '${option}' not understood.`);
+
+        await hookRunner.emit(new HookEvent(argv._[0],{
+            ...hookOptions,
+            hookRunner: hookRunner,
+            packageJson: packageJson
+        }));    
+    }
+
+    catch (e) {
+        if (e.declared)
+            console.log("[error] "+e.message);
+
+        else
+            throw e;
+    }
+}
+
 let booleanOptions=["help","version"];
 let argv=minimist(process.argv.slice(2),{boolean: booleanOptions});
-let hookRunner=await loadHookRunner(process.cwd(),{keyword: "katnip-cli"});
 
-if (argv._.length==2 && argv._[0]=="help") {
-    printHookHelp(hookRunner,argv._[1]);
-    process.exit(1);
+if (argv.version) {
+    let katnipPackageJson=JSON.parse(fs.readFileSync(path.join(__dirname,"../../package.json"),"utf8"));
+    console.log("Katnip version: "+katnipPackageJson.version);
+    process.exit();
 }
 
-if (argv._.length==1 && argv.help) {
-    printHookHelp(hookRunner,argv._[0])
-    process.exit(1);
+if (!fs.existsSync(path.join(process.cwd(),"package.json"))) {
+    await createProject(argv);
+    process.exit();
 }
 
-if (argv._.length!=1 || jsonEq(argv._,["help"])) {
-    console.log("Usage:");
-    console.log();
-	console.log("  katnip help <hook>");
-    console.log("    - Show detailed help about a hook.");
-	console.log();
-    for (let eventType of hookRunner.getEventTypes()) {
-        if (argv.all || !hookRunner.internal.includes(eventType)) {
-            printHookUsage(hookRunner,eventType);
-        }
-    }
-    process.exit(1);
-}
-
-let packageJsonText=fs.readFileSync(path.join(process.cwd(),"package.json"),"utf8");
-let packageJson=JSON.parse(packageJsonText);
-
-try {
-    if (!hookRunner.getListenersByEventType(argv._[0]).length)
-        throw new DeclaredError(`Command '${argv._[0]}' not understood.`);
-
-    let hookOptions={...argv};
-    delete hookOptions._;
-    delete hookOptions.help;
-    delete hookOptions.version;
-
-    let acceptedOptions=hookRunner.getOptionsByEventType(argv._[0]);
-    for (let option in hookOptions)
-        if (!acceptedOptions.includes(option))
-            throw new DeclaredError(`Option '${option}' not understood.`);
-
-    await hookRunner.emit(new HookEvent(argv._[0],{
-        ...hookOptions,
-        hookRunner: hookRunner,
-        packageJson: packageJson
-    }));    
-}
-
-catch (e) {
-    if (e.declared)
-        console.log("[error] "+e.message);
-
-    else
-        throw e;
-}
+await runHooks(argv);
