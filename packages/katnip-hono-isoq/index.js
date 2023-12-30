@@ -10,8 +10,39 @@ async function onBuild(hookEvent) {
 	}
 
 	console.log("Bundling isoq middleware: "+hookEvent.packageJson.main);
+
+	let clientWrapperEvent=hookEvent.clone();
+	clientWrapperEvent.clientWrappers=[];
+	clientWrapperEvent.type="client-wrappers"
+	await hookEvent.hookRunner.emit(clientWrapperEvent);
+	let clientWrappers=clientWrapperEvent.clientWrappers;
+
+	console.log("Client wrappers: ",clientWrappers);
+
+	let source="";
+	for (let [index,wrapper] of clientWrappers.entries())
+		source+=`import Wrapper${index} from "${wrapper}";\n`;
+
+	let mainPath=path.join(process.cwd(),hookEvent.packageJson.main);
+	source+=`import Main from "${mainPath}";\n\n`
+	source+=`export default function(props) {\n`;
+	source+=`  return (\n`;
+	for (let i=0; i<clientWrappers.length; i++)
+		source+=`    <Wrapper${i} {...props}>\n`;
+
+	source+=`    <Main {...props}/>\n`;
+	for (let i=clientWrappers.length-1; i>=0; i--)
+		source+=`    </Wrapper${i}>\n`;
+
+	source+=`  );\n`;
+	source+=`}\n`;
+
+	//console.log(source);
+	fs.mkdirSync("node_modules/.katnip",{recursive: true});
+	fs.writeFileSync("node_modules/.katnip/main.jsx",source);
+
 	await bundler({
-		entryPoint: hookEvent.packageJson.main
+		entryPoint: path.join(process.cwd(),"node_modules/.katnip/main.jsx")
 	});
 }
 
@@ -56,6 +87,8 @@ async function onInit(hookEvent) {
 }
 
 export function registerHooks(hookRunner) {
+	hookRunner.internal.push("client-wrappers");
+
 	hookRunner.on("build",onBuild,{
 		description: "Build isoq middleware."
 	});

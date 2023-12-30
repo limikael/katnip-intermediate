@@ -125,32 +125,6 @@ export async function onMigrate(hookEvent) {
 			throw new Error("Unsupported migration target: "+migrationTarget);
 			break;
 	}
-
-	/*switch (hookEvent.type) {
-		case "dev":
-			switch (hookEvent.platform) {
-				case "node":
-					break;
-
-				default:
-			}
-			break;
-
-		case "deploy":
-			switch (hookEvent.platform) {
-				case "wrangler":
-					break;
-
-				default:
-
-					break;
-			}
-			break;
-
-		default:
-			throw new Error("Unknown event");
-			break;
-	}*/
 }
 
 const QUICKMIN_YAML=
@@ -174,6 +148,11 @@ function onInit(hookEvent) {
 		fs.writeFileSync(quickminYamlFile,QUICKMIN_YAML);
 	}
 }
+
+async function onClientWrappers(event) {
+	event.clientWrappers.push("katnip-hono-quickmin/client-wrapper"); //.jsx");
+}
+
 
 export function registerHooks(hookRunner) {
 	hookRunner.on("hono-middlewares",onHonoMiddlewares,{
@@ -208,4 +187,6 @@ export function registerHooks(hookRunner) {
 	hookRunner.on("init",onInit,{
 		description: "Create quickmin.yaml"
 	});
+
+	hookRunner.on("client-wrappers",onClientWrappers);
 }

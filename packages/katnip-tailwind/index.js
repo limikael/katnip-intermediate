@@ -56,11 +56,17 @@ async function onInit(hookEvent) {
 	}
 }
 
+async function onClientWrappers(event) {
+	event.clientWrappers.push("katnip-tailwind/client-wrapper.jsx");
+}
+
 export function registerHooks(hookRunner) {
 	hookRunner.on("build",onBuild,{
 		description: "Build tailwind.",
 		priority: 50
 	});
+
+	hookRunner.on("client-wrappers",onClientWrappers);
 
 	hookRunner.on("init",onInit,{
 		description: "Create default tailwind .css file.",
