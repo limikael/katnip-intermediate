@@ -1,6 +1,7 @@
 import bundler from "isoq/bundler";
 import path from "path";
 import fs from "fs";
+import {HookEvent} from "katnip";
 
 async function onBuild(hookEvent) {
 	if (!hookEvent.packageJson.main) {
@@ -55,7 +56,17 @@ async function onHonoMiddlewares(hookEvent) {
 
 	let isoqMiddleware=(await import(modulePath)).default;
 
-	app.use("*",isoqMiddleware({localFetch: app.fetch}));
+	async function getProps() {
+		let event=new HookEvent("client-props",hookEvent.clone());
+		event.props={};
+		await hookEvent.hookRunner.emit(event);
+		return event.props;
+	}
+
+	app.use("*",isoqMiddleware({
+		localFetch: app.fetch,
+		props: getProps
+	}));
 }
 
 async function onWorkerModules(hookEvent) {
@@ -88,6 +99,7 @@ async function onInit(hookEvent) {
 
 export function registerHooks(hookRunner) {
 	hookRunner.internal.push("client-wrappers");
+	hookRunner.internal.push("client-props");
 
 	hookRunner.on("build",onBuild,{
 		description: "Build isoq middleware."

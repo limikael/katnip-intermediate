@@ -1,5 +1,5 @@
 import {Hono} from 'hono';
-import {HookRunner} from "katnip";
+import {HookRunner, HookEvent} from "katnip";
 
 $$WORKER_MODULES$$
 
@@ -10,9 +10,15 @@ for (let k in workerModules)
 
 const app=new Hono();
 
-await hookRunner.emit("hono-middlewares",{
+let launchEvent=$$LAUNCH_EVENT$$;
+launchEvent.app=app;
+launchEvent.workerModules=workerModules;
+
+await hookRunner.emit(new HookEvent("hono-middlewares",launchEvent));
+
+/*await hookRunner.emit("hono-middlewares",{
 	workerModules: workerModules,
 	app: app
-});
+});*/
 
 export default app;

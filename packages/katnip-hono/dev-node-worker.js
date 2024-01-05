@@ -3,16 +3,19 @@ import {serve} from '@hono/node-server';
 import path from "path";
 import {fileURLToPath} from 'url';
 import {loadHookRunner} from "katnip";
-import {parentPort} from "worker_threads";
+import {parentPort, workerData} from "worker_threads";
+
+//console.log("Worker launched: ",workerData);
 
 const app=new Hono();
 console.log("Loading hono middlewares...");
 
 let hookRunner=await loadHookRunner(process.cwd(),{keyword: "katnip-cli"});
 
-await hookRunner.emit("hono-middlewares",{
-	app: app
-});
+let launchEvent=workerData;
+launchEvent.app=app;
+
+await hookRunner.emit("hono-middlewares",launchEvent);
 
 let resolveStarted;
 let startedPromise=new Promise(r=>resolveStarted=r);

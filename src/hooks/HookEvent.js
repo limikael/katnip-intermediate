@@ -9,7 +9,12 @@ export default class HookEvent {
 	}
 
 	clone() {
-		return new HookEvent(this.type,this);
+		let newEvent={...this};
+		delete newEvent.propagationStopped;
+		delete newEvent.hookRunner;
+		//delete newEvent.remaining;
+
+		return new HookEvent(this.type,newEvent);
 	}
 
 	async runRemaining() {

@@ -38,9 +38,13 @@ async function onDev(hookEvent) {
 	}
 
 	else {
+		//console.log("***** node dev...",JSON.stringify(hookEvent));
+
 		let startedPromise=new ResolvablePromise();
 		let stoppedPromise=new ResolvablePromise();
-		let worker=new Worker(path.join(__dirname,"dev-node-worker.js"));
+		let worker=new Worker(path.join(__dirname,"dev-node-worker.js"),{
+			workerData: hookEvent.clone()
+		});
 		worker.on("message",(message)=>{
 			switch (message) {
 				case "started":
@@ -122,10 +126,11 @@ async function onBuild(hookEvent) {
 	if (hookEvent.platform=="wrangler") {
 		console.log("Building worker...");
 
-		let workerModules={};
-		await hookEvent.hookRunner.emit("worker-modules",{
-			workerModules: workerModules
-		});
+		let workerModulesEvent=hookEvent.clone();
+		workerModulesEvent.workerModules={};
+		workerModulesEvent.type="worker-modules";
+		await hookEvent.hookRunner.emit(workerModulesEvent);
+		let workerModules=workerModulesEvent.workerModules;
 
 		console.log("Using worker modules:");
 		console.log(workerModules);
@@ -136,8 +141,13 @@ async function onBuild(hookEvent) {
 
 		workerModulesSource+=`let workerModules={${Object.keys(workerModules).join(",")}};\n`;
 
-		let workerStub=fs.readFileSync(path.join(__dirname,"worker-stub.js"),"utf8");
-		let workerSource=workerStub.replace("$$WORKER_MODULES$$",workerModulesSource);
+		let launchEvent=hookEvent.clone();
+		delete launchEvent.remaining;
+		delete launchEvent.type;
+
+		let workerSource=fs.readFileSync(path.join(__dirname,"worker-stub.js"),"utf8");
+		workerSource=workerSource.replace("$$WORKER_MODULES$$",workerModulesSource);
+		workerSource=workerSource.replace("$$LAUNCH_EVENT$$",JSON.stringify(launchEvent,null,2));
 
 		fs.mkdirSync(path.join(process.cwd(),".target"),{recursive: true});
 		fs.writeFileSync(path.join(process.cwd(),".target/worker.js"),workerSource);
