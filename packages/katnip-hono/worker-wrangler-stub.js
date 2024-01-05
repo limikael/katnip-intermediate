@@ -13,12 +13,8 @@ const app=new Hono();
 let launchEvent=$$LAUNCH_EVENT$$;
 launchEvent.app=app;
 launchEvent.workerModules=workerModules;
+launchEvent.workerData=$$WORKER_DATA$$;
 
 await hookRunner.emit(new HookEvent("hono-middlewares",launchEvent));
-
-/*await hookRunner.emit("hono-middlewares",{
-	workerModules: workerModules,
-	app: app
-});*/
 
 export default app;

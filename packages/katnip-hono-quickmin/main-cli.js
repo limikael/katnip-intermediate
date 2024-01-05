@@ -1,5 +1,3 @@
-import {quickmin} from "quickmin/hono-middleware";
-import {drizzleSqliteDriver} from "quickmin/drizzle-sqlite";
 import fs from "fs";
 import path from "path";
 import * as TOML from "@ltd/j-toml";
@@ -9,23 +7,23 @@ import {DeclaredError} from "katnip";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-async function onHonoMiddlewares(hookEvent) {
-	let app=hookEvent.app;
-
-	console.log("Setting up hono quickmin...");
-
-	let quickminYaml=fs.readFileSync("quickmin.yaml","utf8");
-	let quickminDrivers=[
-	    drizzleSqliteDriver,
-	];
-
-	app.use("*",quickmin(quickminYaml,quickminDrivers));
-}
-
 async function onWorkerModules(hookEvent) {
 	console.log("adding hono quickmin worker module");
-	hookEvent.workerModules.katnipHonoQuickmin="katnip-hono-quickmin";
-	hookEvent.workerModules.quickminYaml="../quickmin.yaml";
+	switch (hookEvent.platform) {
+		case "node":
+			hookEvent.workerModules.katnipHonoQuickmin="katnip-hono-quickmin/main-server-node.js";
+			break;
+
+		case "wrangler":
+			hookEvent.workerModules.katnipHonoQuickmin="katnip-hono-quickmin/main-server-workerd.js";
+			break;
+
+		default:
+			throw new Error("Unknown platform: "+hookEvent.platform);
+			break;
+	}
+
+	hookEvent.workerData.quickminYaml=fs.readFileSync("quickmin.yaml","utf8");
 }
 
 async function onBuild(hookEvent) {
@@ -37,19 +35,6 @@ async function onBuild(hookEvent) {
 			wrangler=TOML.parse(fs.readFileSync(wranglerPath,"utf8"));
 
 		wrangler.node_compat = true;
-
-		if (!wrangler.rules)
-			wrangler.rules=[];
-
-		let haveYamlRule=false;
-		for (let rule of wrangler.rules)
-			if (rule.globs.includes("**/*.yaml"))
-				haveYamlRule=true;
-
-		if (!haveYamlRule) {
-			console.log("Adding yaml parsing rule to wrangler.toml");
-			wrangler.rules.push({type: "Text", globs: ["**/*.yaml"], fallthrough: true})
-		}
 
 		if (!wrangler.d1_databases)
 			wrangler.d1_databases=[];
@@ -150,15 +135,14 @@ function onInit(hookEvent) {
 }
 
 async function onClientWrappers(event) {
-	event.clientWrappers.push("katnip-hono-quickmin/client-wrapper"); //.jsx");
+	event.clientWrappers.push("katnip-hono-quickmin/client-wrapper.jsx");
 }
 
-
 export function registerHooks(hookRunner) {
-	hookRunner.on("hono-middlewares",onHonoMiddlewares,{
+	/*hookRunner.on("hono-middlewares",onHonoMiddlewares,{
 		priority: 15,
 		description: "Add hono middleware for quickmin."
-	});
+	});*/
 
 	hookRunner.on("worker-modules",onWorkerModules,{
 		description: "Add quickmin worker modules."

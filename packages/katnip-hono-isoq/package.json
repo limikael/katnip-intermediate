@@ -1,7 +1,7 @@
 {
   "name": "katnip-hono-isoq",
-  "version": "1.0.8",
-  "main": "index.js",
+  "version": "1.0.9",
+  "main": "main-cli.js",
   "license": "MIT",
   "type": "module",
   "keywords": [
@@ -9,9 +9,6 @@
   ],
   "dependencies": {
     "isoq": "^1.0.7",
-    "katnip": "^2.0.0"
-  },
-  "exports": {
-    "workerd": "./index-workerd.js"
+    "katnip": "^2.0.8"
   }
 }

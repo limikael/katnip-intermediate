@@ -1,11 +1,11 @@
-import {serveStatic} from "fullstack-utils/hono-cloudflare-content";
+import {serveStatic} from '@hono/node-server/serve-static';
 
 async function onHonoMiddlewares(hookEvent) {
-	let isoqMiddleware=hookEvent.workerModules.isoqMiddleware;
-
 	let app=hookEvent.app;
 
-	app.use("*",serveStatic());
+	console.log("Setting up hono static content for node...");
+
+	app.use('*',serveStatic({root: './public'}))
 }
 
 export function registerHooks(hookRunner) {

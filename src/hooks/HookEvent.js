@@ -20,6 +20,7 @@ export default class HookEvent {
 	async runRemaining() {
 		let newEvent=this.clone();
 		newEvent.propagationStopped=false;
+		newEvent.hookRunner=this.hookRunner;
 
 		return await this.hookRunner.runListeners(newEvent.remaining,newEvent);		
 	}

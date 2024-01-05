@@ -59,8 +59,6 @@ async function onDev(hookEvent) {
 }
 
 export function registerHooks(hookRunner) {
-	hookRunner.internal.push("hono-middlewares","worker-modules");
-
 	hookRunner.on("dev",onDev,{
 		description: "Watch for changed files, re-run rest of commands.",
 		priority: 5

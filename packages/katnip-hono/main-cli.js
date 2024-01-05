@@ -3,7 +3,7 @@ import {serve} from '@hono/node-server';
 import path from "path";
 import {fileURLToPath} from 'url';
 import fs from "fs";
-import {runCommand} from "./node-utils.js";
+import {runCommand} from "./node-util.js";
 import {Job} from "katnip";
 import {Worker} from "worker_threads";
 import {ResolvablePromise} from "./js-util.js";
@@ -28,6 +28,8 @@ async function onDeploy(hookEvent) {
 	}
 }
 
+
+
 async function onDev(hookEvent) {
 	if (hookEvent.platform=="wrangler") {
         await runCommand(
@@ -40,10 +42,21 @@ async function onDev(hookEvent) {
 	else {
 		//console.log("***** node dev...",JSON.stringify(hookEvent));
 
+		let workerModulesEvent=hookEvent.clone();
+		workerModulesEvent.workerModules={};
+		workerModulesEvent.workerData={};
+		await hookEvent.hookRunner.emit("worker-modules",workerModulesEvent);
+
+		console.log("Node worker modules",workerModulesEvent.workerModules);
+
+		let launchEvent=hookEvent.clone();
+		launchEvent.workerModules=workerModulesEvent.workerModules;
+		launchEvent.workerData=workerModulesEvent.workerData;
+
 		let startedPromise=new ResolvablePromise();
 		let stoppedPromise=new ResolvablePromise();
-		let worker=new Worker(path.join(__dirname,"dev-node-worker.js"),{
-			workerData: hookEvent.clone()
+		let worker=new Worker(path.join(__dirname,"worker-node.js"),{
+			workerData: launchEvent
 		});
 		worker.on("message",(message)=>{
 			switch (message) {
@@ -71,6 +84,17 @@ async function onDev(hookEvent) {
 			await stoppedPromise;
 		});
 	}
+}
+
+async function onEarlyDev(hookEvent) {
+	if (!hookEvent.platform)
+		hookEvent.platform="node";
+
+	let supportedPlatforms=["node","wrangler"];
+	if (!supportedPlatforms.includes(hookEvent.platform))
+		throw new DeclaredError("Unknown platform: "+hookEvent.platform+", supported: "+supportedPlatforms);
+
+	console.log("Dev for: "+hookEvent.platform);
 }
 
 async function onEarlyDeploy(hookEvent) {
@@ -128,9 +152,11 @@ async function onBuild(hookEvent) {
 
 		let workerModulesEvent=hookEvent.clone();
 		workerModulesEvent.workerModules={};
+		workerModulesEvent.workerData={};
 		workerModulesEvent.type="worker-modules";
 		await hookEvent.hookRunner.emit(workerModulesEvent);
 		let workerModules=workerModulesEvent.workerModules;
+		let workerData=workerModulesEvent.workerData;
 
 		console.log("Using worker modules:");
 		console.log(workerModules);
@@ -145,9 +171,10 @@ async function onBuild(hookEvent) {
 		delete launchEvent.remaining;
 		delete launchEvent.type;
 
-		let workerSource=fs.readFileSync(path.join(__dirname,"worker-stub.js"),"utf8");
+		let workerSource=fs.readFileSync(path.join(__dirname,"worker-wrangler-stub.js"),"utf8");
 		workerSource=workerSource.replace("$$WORKER_MODULES$$",workerModulesSource);
 		workerSource=workerSource.replace("$$LAUNCH_EVENT$$",JSON.stringify(launchEvent,null,2));
+		workerSource=workerSource.replace("$$WORKER_DATA$$",JSON.stringify(workerData,null,2));
 
 		fs.mkdirSync(path.join(process.cwd(),".target"),{recursive: true});
 		fs.writeFileSync(path.join(process.cwd(),".target/worker.js"),workerSource);
@@ -192,6 +219,11 @@ export function registerHooks(hookRunner) {
 
 	hookRunner.on("deploy",onEarlyDeploy,{
 		description: "Check deploy settings.",
+		priority: 1,
+	});
+
+	hookRunner.on("dev",onEarlyDev,{
+		description: "Check dev settings.",
 		priority: 1,
 	});
 

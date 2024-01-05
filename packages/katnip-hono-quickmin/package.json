@@ -1,7 +1,7 @@
 {
   "name": "katnip-hono-quickmin",
-  "version": "1.0.7",
-  "main": "index.js",
+  "version": "1.0.8",
+  "main": "main-cli.js",
   "license": "MIT",
   "type": "module",
   "keywords": [
@@ -12,11 +12,5 @@
     "katnip": "^2.0.4",
     "quickmin": "^0.0.19",
     "wrangler": "^3.22.1"
-  },
-  "exports": {
-    ".": {
-      "workerd": "./index-workerd.js"
-    },
-    "./client-wrapper": "./client-wrapper.jsx"
   }
 }

@@ -4,7 +4,7 @@ import {r2StorageDriver} from "quickmin/r2-storage";
 import {parse as parseYaml} from "yaml";
 
 async function onHonoMiddlewares(hookEvent) {
-  let quickminYaml=hookEvent.workerModules.quickminYaml.default;
+  let quickminYaml=hookEvent.workerData.quickminYaml;
   let quickminConf=parseYaml(quickminYaml);
 
   if (quickminConf.d1Binding && quickminConf.d1Binding!="DB")

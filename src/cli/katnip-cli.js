@@ -8,7 +8,7 @@ import HookEvent from "../hooks/HookEvent.js";
 import {DeclaredError, jsonEq} from "../utils/js-util.js";
 import fs from "fs";
 import {listenerGetDescription} from "../hooks/listener-util.js";
-import {runCommand} from "../utils/node-utils.js";
+import {runCommand} from "../utils/node-util.js";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 function printHookUsage(hookRunner, event) {

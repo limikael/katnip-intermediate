@@ -1,6 +1,6 @@
 {
   "name": "katnip-twentytwentyfour",
-  "version": "1.0.18",
+  "version": "1.0.20",
   "main": "index.js",
   "license": "MIT",
   "type": "module",
@@ -8,12 +8,12 @@
     "katnip-cli"
   ],
   "dependencies": {
-    "katnip-hono": "^1.0.9",
-    "katnip-hono-isoq": "^1.0.8",
-    "katnip-hono-quickmin": "^1.0.7",
-    "katnip-hono-static": "^1.0.3",
+    "katnip-hono": "^1.0.11",
+    "katnip-hono-isoq": "^1.0.9",
+    "katnip-hono-quickmin": "^1.0.8",
+    "katnip-hono-static": "^1.0.4",
     "katnip-tailwind": "^1.0.3",
-    "katnip-watch": "^1.0.2",
-    "katnip": "^2.0.7"
+    "katnip-watch": "^1.0.3",
+    "katnip": "^2.0.8"
   }
 }

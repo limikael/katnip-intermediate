@@ -2,17 +2,23 @@ import {Hono} from 'hono';
 import {serve} from '@hono/node-server';
 import path from "path";
 import {fileURLToPath} from 'url';
-import {loadHookRunner} from "katnip";
+import {HookRunner} from "katnip";
 import {parentPort, workerData} from "worker_threads";
-
+import {resolveImport} from "./node-util.js";
 //console.log("Worker launched: ",workerData);
 
-const app=new Hono();
-console.log("Loading hono middlewares...");
-
-let hookRunner=await loadHookRunner(process.cwd(),{keyword: "katnip-cli"});
-
+let hookRunner=new HookRunner();
 let launchEvent=workerData;
+
+let workerModules=launchEvent.workerModules;
+for (let k in workerModules) {
+	workerModules[k]=await import(resolveImport(workerModules[k]));
+
+	if (workerModules[k].registerHooks)
+		workerModules[k].registerHooks(hookRunner);
+}
+
+let app=new Hono();
 launchEvent.app=app;
 
 await hookRunner.emit("hono-middlewares",launchEvent);

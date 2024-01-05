@@ -47,30 +47,8 @@ async function onBuild(hookEvent) {
 	});
 }
 
-async function onHonoMiddlewares(hookEvent) {
-	let app=hookEvent.app;
-
-	//let modulePath=path.join(process.cwd(),"node_modules/__ISOQ_MIDDLEWARE/isoq-hono.js?random="+Math.random());
-	let modulePath=path.join(process.cwd(),"node_modules/__ISOQ_MIDDLEWARE/isoq-hono.js");
-	console.log("Loading isoq module: "+modulePath);
-
-	let isoqMiddleware=(await import(modulePath)).default;
-
-	async function getProps() {
-		let event=new HookEvent("client-props",hookEvent.clone());
-		event.props={};
-		await hookEvent.hookRunner.emit(event);
-		return event.props;
-	}
-
-	app.use("*",isoqMiddleware({
-		localFetch: app.fetch,
-		props: getProps
-	}));
-}
-
 async function onWorkerModules(hookEvent) {
-	hookEvent.workerModules.katnipHonoIsoq="katnip-hono-isoq";
+	hookEvent.workerModules.katnipHonoIsoq="katnip-hono-isoq/main-server.js";
 	hookEvent.workerModules.isoqMiddleware="__ISOQ_MIDDLEWARE";
 }
 
@@ -107,11 +85,6 @@ export function registerHooks(hookRunner) {
 
 	hookRunner.on("worker-modules",onWorkerModules,{
 		description: "Add isoq worker modules."
-	});
-
-	hookRunner.on("hono-middlewares",onHonoMiddlewares,{
-		description: "Add isoq hono middleware.",
-		priority: 20
 	});
 
 	hookRunner.on("init",onInit,{
