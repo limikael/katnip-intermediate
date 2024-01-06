@@ -70,7 +70,27 @@ export default class HookRunner {
 		return arrayUnique(optionDescriptions);
 	}
 
-	async runListeners(listeners, event) {
+	getClosuresByEventType(eventType) {
+		let listeners=this.getListenersByEventType(eventType);
+		let closures=[];
+
+		for (let listener of listeners) {
+			if (listener.func)
+				closures.push(listener.func)
+
+			else if (listener.sub)
+				closures.push(async (ev)=>{
+					await this.emit(listener.sub,ev.clone());
+				});
+
+			else
+				throw new Error("What kind of listener is this?");
+		}
+
+		return closures;
+	}
+
+	/*async runListeners(listeners, event) {
 		let ret;
 		let remainingListeners=[...listeners];
 		for (let listener of listeners) {
@@ -90,7 +110,7 @@ export default class HookRunner {
 		}
 
 		return ret;
-	}
+	}*/
 
 	async emit(event, eventOptions) {
 		if (typeof event=="string")
@@ -100,9 +120,8 @@ export default class HookRunner {
 			if (eventOptions)
 				throw new Error("Event options only allowed if event is a string.");
 
-		//console.log("**** emit: "+event.type);
+		console.log("running event ",event);
 
-		event.hookRunner=this;
-		await this.runListeners(this.getListenersByEventType(event.type),event);
+		event.run(this,this.getClosuresByEventType(event.type));
 	}
 }

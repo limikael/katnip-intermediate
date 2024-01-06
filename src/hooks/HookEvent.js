@@ -12,16 +12,28 @@ export default class HookEvent {
 		let newEvent={...this};
 		delete newEvent.propagationStopped;
 		delete newEvent.hookRunner;
-		//delete newEvent.remaining;
+		delete newEvent.listeners;
 
 		return new HookEvent(this.type,newEvent);
 	}
 
 	async runRemaining() {
 		let newEvent=this.clone();
-		newEvent.propagationStopped=false;
-		newEvent.hookRunner=this.hookRunner;
 
-		return await this.hookRunner.runListeners(newEvent.remaining,newEvent);		
+		return await newEvent.run(this.hookRunner,[...this.listeners]);
+	}
+
+	async run(hookRunner, listeners) {
+		if (this.listeners)
+			throw new Error("event already run");
+
+		this.hookRunner=hookRunner;
+		this.listeners=listeners;
+		this.propagationStopped=false;
+
+		while (this.listeners.length && !this.propagationStopped) {
+			let listener=this.listeners.shift();
+			await listener(this);
+		}
 	}
 }
