@@ -6,7 +6,7 @@ x init/create
 x client side hooks
 x set options in config
 x redirect to https
-- event refactor, server events
+x event refactor, server events
 
 Maybe:
 - undeploy?
