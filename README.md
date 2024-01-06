@@ -5,7 +5,7 @@ x init/create
   x install deps
 x client side hooks
 x set options in config
-- redirect to https
+x redirect to https
 - event refactor, server events
 
 Maybe:
