@@ -17,6 +17,9 @@ for (let k in workerModules) {
 		workerModules[k].registerHooks(hookRunner);
 }
 
+if (workerModules.serverEventHandler)
+	hookRunner.addListenerModule(workerModules.serverEventHandler)
+
 let app=new Hono();
 launchEvent.app=app;
 

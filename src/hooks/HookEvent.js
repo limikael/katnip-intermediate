@@ -31,9 +31,12 @@ export default class HookEvent {
 		this.listeners=listeners;
 		this.propagationStopped=false;
 
+		let ret;
 		while (this.listeners.length && !this.propagationStopped) {
 			let listener=this.listeners.shift();
-			await listener(this);
+			ret=await listener(this);
 		}
+
+		return ret;
 	}
 }

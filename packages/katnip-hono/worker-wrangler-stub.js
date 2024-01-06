@@ -9,6 +9,9 @@ for (let k in workerModules)
 	if (workerModules[k].registerHooks)
 		workerModules[k].registerHooks(hookRunner);
 
+if (workerModules.serverEventHandler)
+	hookRunner.addListenerModule(workerModules.serverEventHandler)
+
 const app=new Hono();
 app.use("*",httpsRedirect({
     ignore: ["localhost","127.0.0.1"]

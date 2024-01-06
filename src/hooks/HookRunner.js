@@ -27,6 +27,20 @@ export default class HookRunner {
 		this.listeners.push(listener);
 	}
 
+	addListenerModule(mod, options={}) {
+		for (let funcName in mod) {
+			let func=mod[funcName];
+			let listener={
+				...options,
+				event: funcName,
+				func: func,
+				hookRunner: this
+			}
+
+			this.listeners.push(listener);
+		}
+	}
+
 	getEventTypes() {
 		let eventTypes=[];
 		for (let listener of this.listeners) {
@@ -90,28 +104,6 @@ export default class HookRunner {
 		return closures;
 	}
 
-	/*async runListeners(listeners, event) {
-		let ret;
-		let remainingListeners=[...listeners];
-		for (let listener of listeners) {
-			remainingListeners.shift();
-			event.remaining=remainingListeners;
-			if (listener.func)
-				ret=await listener.func(event);
-
-			else if (listener.sub)
-				await this.emit(listener.sub,event);
-
-			else
-				throw new Error("Not functional or sub?");
-
-			if (event.propagationStopped)
-				return;
-		}
-
-		return ret;
-	}*/
-
 	async emit(event, eventOptions) {
 		if (typeof event=="string")
 			event=new HookEvent(event, eventOptions);
@@ -120,8 +112,6 @@ export default class HookRunner {
 			if (eventOptions)
 				throw new Error("Event options only allowed if event is a string.");
 
-		//console.log("running event ",event);
-
-		event.run(this,this.getClosuresByEventType(event.type));
+		return await event.run(this,this.getClosuresByEventType(event.type));
 	}
 }

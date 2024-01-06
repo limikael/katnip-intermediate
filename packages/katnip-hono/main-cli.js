@@ -28,7 +28,16 @@ async function onDeploy(hookEvent) {
 	}
 }
 
+async function getDefaultWorkerModules(hookEvent) {
+	let workerModules={};
 
+	if (hookEvent.packageJson.events) {
+		let handlerPath=path.join(process.cwd(),hookEvent.packageJson.events);
+		workerModules.serverEventHandler=handlerPath;
+	}
+
+	return workerModules;
+}
 
 async function onDev(hookEvent) {
 	if (hookEvent.platform=="wrangler") {
@@ -41,9 +50,10 @@ async function onDev(hookEvent) {
 
 	else {
 		//console.log("***** node dev...",JSON.stringify(hookEvent));
+		console.log("****** node dev...");
 
 		let workerModulesEvent=hookEvent.clone();
-		workerModulesEvent.workerModules={};
+		workerModulesEvent.workerModules=await getDefaultWorkerModules(hookEvent);
 		workerModulesEvent.workerData={};
 		await hookEvent.hookRunner.emit("worker-modules",workerModulesEvent);
 
@@ -151,7 +161,7 @@ async function onBuild(hookEvent) {
 		console.log("Building worker...");
 
 		let workerModulesEvent=hookEvent.clone();
-		workerModulesEvent.workerModules={};
+		workerModulesEvent.workerModules=await getDefaultWorkerModules(hookEvent);
 		workerModulesEvent.workerData={};
 		workerModulesEvent.type="worker-modules";
 		await hookEvent.hookRunner.emit(workerModulesEvent);
