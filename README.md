@@ -9,7 +9,7 @@ x redirect to https
 - event refactor, server events
 
 Maybe:
-- unpublish?
+- undeploy?
 
 Conditional exports...
 
