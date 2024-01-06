@@ -3,8 +3,12 @@ x options doc
 x auto migrate
 x init/create
   x install deps
-- client side hooks
-- set options in config
+x client side hooks
+x set options in config
+- redirect to https
+- event refactor, server events
+
+Maybe:
 - unpublish?
 
 Conditional exports...

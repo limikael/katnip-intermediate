@@ -1,6 +1,6 @@
 {
   "name": "katnip-twentytwentyfour",
-  "version": "1.0.20",
+  "version": "1.0.21",
   "main": "index.js",
   "license": "MIT",
   "type": "module",
@@ -14,6 +14,6 @@
     "katnip-hono-static": "^1.0.4",
     "katnip-tailwind": "^1.0.3",
     "katnip-watch": "^1.0.3",
-    "katnip": "^2.0.8"
+    "katnip": "^2.0.9"
   }
 }

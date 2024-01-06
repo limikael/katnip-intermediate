@@ -149,9 +149,17 @@ async function runHooks(argv) {
             if (!acceptedOptions.includes(option))
                 throw new DeclaredError(`Option '${option}' not understood.`);
 
+        if (packageJson.katnip)
+            hookOptions={...packageJson.katnip,...hookOptions};
+
+        let katnipJsonPath=path.join(process.cwd(),"katnip.json");
+        if (fs.existsSync(katnipJsonPath)) {
+            let katnipJson=JSON.parse(fs.readFileSync(katnipJsonPath,"utf8"));
+            hookOptions={...katnipJson,...hookOptions};
+        }
+
         await hookRunner.emit(new HookEvent(argv._[0],{
             ...hookOptions,
-            hookRunner: hookRunner,
             packageJson: packageJson
         }));    
     }
