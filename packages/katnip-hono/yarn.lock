@@ -56,6 +56,14 @@ findup-sync@^4.0.0:
     micromatch "^4.0.2"
     resolve-dir "^1.0.1"
 
+fullstack-utils@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/fullstack-utils/-/fullstack-utils-1.0.5.tgz#3362b67bbcff98bf32377b97fd98d334ad2c768c"
+  integrity sha512-FG25UEix4tApLLf01phEtX3geM+jgABanrLQpIMbJSqbplCqCgZW9Pm3swUciuzlsPmMf0GnIaQooZU1bpB3QQ==
+  dependencies:
+    hono "^3.7.2"
+    url-join "^5.0.0"
+
 global-modules@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/global-modules/-/global-modules-1.0.0.tgz#6d770f0eb523ac78164d72b5e71a8877265cc3ea"
@@ -87,6 +95,11 @@ hono@^3.11.9:
   version "3.11.9"
   resolved "https://registry.yarnpkg.com/hono/-/hono-3.11.9.tgz#0495490442e51dac764c9064c1dfe5a6f444aeaf"
   integrity sha512-vjwVHw/y9xXPf7a87XjAPE9d3NFLyDiDBHmTU5SsGiJoe4BSiU/Yiu5UB9orhP+YGkSwD7fzXmuG7lpvKnr15w==
+
+hono@^3.7.2:
+  version "3.12.0"
+  resolved "https://registry.yarnpkg.com/hono/-/hono-3.12.0.tgz#889214938af36ac265a99864f4a0104c4942f3fa"
+  integrity sha512-UPEtZuLY7Wo7g0mqKWSOjLFdT8t7wJ60IYEcxKl3AQNU4u+R2QqU2fJMPmSu24C+/ag20Z8mOTQOErZzK4DMvA==
 
 ini@^1.3.4:
   version "1.3.8"
@@ -120,10 +133,10 @@ isexe@^2.0.0:
   resolved "https://registry.yarnpkg.com/isexe/-/isexe-2.0.0.tgz#e8fbf374dc556ff8947a10dcb0572d633f2cfa10"
   integrity sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==
 
-katnip@^2.0.2:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/katnip/-/katnip-2.0.2.tgz#0381054015292b38b98aaa5371967dc666ea6b8f"
-  integrity sha512-TGDThzKU7ENZ1VrtFvKfbdLWZ257yriMtDniIU9mxBAaqDRidxtrkiKuYzFgxXEYiHtqq2sgojpJfjvVKJEVgQ==
+katnip@^2.0.8:
+  version "2.0.9"
+  resolved "https://registry.yarnpkg.com/katnip/-/katnip-2.0.9.tgz#a8b9e221b780a89be30fdb94f53ec6dcc0d617d0"
+  integrity sha512-3gtZXm1XGrsIzwTWW3pmKTWmpa99Ow0H7K9VehGff0aAXLsSVwpigbinzGw/yFpqVH58ERrH62pqC0kbWonrdw==
   dependencies:
     find-node-modules "^2.1.3"
     minimist "^1.2.8"
@@ -170,6 +183,11 @@ to-regex-range@^5.0.1:
   integrity sha512-65P7iz6X5yEr1cwcgvQxbbIw7Uk3gOy5dIdtZ4rDveLqhrdJP+Li/Hx6tyK0NEb+2GCyneCMJiGqrADCSNk8sQ==
   dependencies:
     is-number "^7.0.0"
+
+url-join@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/url-join/-/url-join-5.0.0.tgz#c2f1e5cbd95fa91082a93b58a1f42fecb4bdbcf1"
+  integrity sha512-n2huDr9h9yzd6exQVnH/jU5mr+Pfx08LRXXZhkLLetAMESRj+anQsTAh940iMrIetKAmry9coFuZQ2jY8/p3WA==
 
 which@^1.2.14:
   version "1.3.1"

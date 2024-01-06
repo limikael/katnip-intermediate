@@ -1,5 +1,6 @@
 import {Hono} from 'hono';
 import {HookRunner, HookEvent} from "katnip";
+import {httpsRedirect} from "fullstack-utils/hono-https-redirect";
 
 $$WORKER_MODULES$$
 
@@ -9,6 +10,9 @@ for (let k in workerModules)
 		workerModules[k].registerHooks(hookRunner);
 
 const app=new Hono();
+app.use("*",httpsRedirect({
+    ignore: ["localhost","127.0.0.1"]
+}));
 
 let launchEvent=$$LAUNCH_EVENT$$;
 launchEvent.app=app;

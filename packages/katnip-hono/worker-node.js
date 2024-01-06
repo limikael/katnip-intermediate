@@ -5,7 +5,6 @@ import {fileURLToPath} from 'url';
 import {HookRunner} from "katnip";
 import {parentPort, workerData} from "worker_threads";
 import {resolveImport} from "./node-util.js";
-//console.log("Worker launched: ",workerData);
 
 let hookRunner=new HookRunner();
 let launchEvent=workerData;
