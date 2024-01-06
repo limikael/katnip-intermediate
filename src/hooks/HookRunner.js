@@ -80,7 +80,7 @@ export default class HookRunner {
 
 			else if (listener.sub)
 				closures.push(async (ev)=>{
-					await this.emit(listener.sub,ev.clone());
+					return await this.emit(listener.sub,ev.clone());
 				});
 
 			else
@@ -120,7 +120,7 @@ export default class HookRunner {
 			if (eventOptions)
 				throw new Error("Event options only allowed if event is a string.");
 
-		console.log("running event ",event);
+		//console.log("running event ",event);
 
 		event.run(this,this.getClosuresByEventType(event.type));
 	}
