@@ -1,6 +1,6 @@
 {
   "name": "katnip-hono",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "main": "main-cli.js",
   "license": "MIT",
   "type": "module",
@@ -12,6 +12,6 @@
     "@ltd/j-toml": "^1.38.0",
     "fullstack-utils": "^1.0.5",
     "hono": "^3.11.9",
-    "katnip": "^2.0.8"
+    "katnip": "^2.0.10"
   }
 }
