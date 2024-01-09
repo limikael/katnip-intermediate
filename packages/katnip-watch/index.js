@@ -14,7 +14,7 @@ async function onDev(hookEvent) {
 		"**/node_modules/**", "**/.git/**", "**/*.db*",
 		"**/.env", "**/package.json", "**/package-lock.json", "**/yarn.lock",
 		"**/katnip-cli.js","**/public","**/.target","**/.wrangler",
-		"**/wrangler.toml"
+		"**/wrangler.toml","**/upload"
 	];
 
 	let watcher=chokidar.watch(watchDirs,{
