@@ -1,6 +1,7 @@
 import {quickmin} from "quickmin/hono-middleware";
 import {drizzleSqliteDriver} from "quickmin/drizzle-sqlite";
 import {nodeStorageDriver} from "quickmin/node-storage";
+import {localNodeBundle} from "quickmin/local-node-bundle";
 
 async function onHonoMiddlewares(hookEvent) {
 	let app=hookEvent.app;
@@ -11,6 +12,7 @@ async function onHonoMiddlewares(hookEvent) {
 	let quickminDrivers=[
 	    drizzleSqliteDriver,
 	    nodeStorageDriver,
+        //localNodeBundle
 	];
 
 	app.use("*",quickmin(quickminYaml,quickminDrivers));

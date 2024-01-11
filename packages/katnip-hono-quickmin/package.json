@@ -1,6 +1,6 @@
 {
   "name": "katnip-hono-quickmin",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "main": "main-cli.js",
   "license": "MIT",
   "type": "module",
