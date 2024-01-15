@@ -1,6 +1,7 @@
 {
   "name": "katnip-hono-quickmin",
-  "version": "1.0.11",
+  "scripts": {},
+  "version": "1.0.13",
   "main": "main-cli.js",
   "license": "MIT",
   "type": "module",
@@ -9,8 +10,8 @@
   ],
   "dependencies": {
     "@ltd/j-toml": "^1.38.0",
-    "katnip": "^2.0.4",
-    "quickmin": "^0.0.20",
+    "katnip": "^2.0.12",
+    "quickmin": "^0.0.22",
     "wrangler": "^3.22.1"
   }
 }

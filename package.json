@@ -1,6 +1,7 @@
 {
   "name": "katnip",
-  "version": "2.0.10",
+  "scripts": {},
+  "version": "2.0.12",
   "bin": {
     "katnip": "src/cli/katnip-cli.js"
   },

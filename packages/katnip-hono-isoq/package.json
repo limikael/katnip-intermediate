@@ -1,6 +1,7 @@
 {
   "name": "katnip-hono-isoq",
-  "version": "1.0.9",
+  "scripts": {},
+  "version": "1.0.11",
   "main": "main-cli.js",
   "license": "MIT",
   "type": "module",
@@ -8,7 +9,7 @@
     "katnip-cli"
   ],
   "dependencies": {
-    "isoq": "^1.0.7",
-    "katnip": "^2.0.8"
+    "isoq": "^1.0.9",
+    "katnip": "^2.0.12"
   }
 }
