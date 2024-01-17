@@ -1,7 +1,7 @@
 {
   "name": "katnip-hono",
   "scripts": {},
-  "version": "1.0.14",
+  "version": "1.0.15",
   "main": "main-cli.js",
   "license": "MIT",
   "type": "module",
@@ -11,7 +11,7 @@
   "dependencies": {
     "@hono/node-server": "^1.3.3",
     "@ltd/j-toml": "^1.38.0",
-    "fullstack-utils": "^1.0.7",
+    "fullstack-utils": "^1.0.8",
     "hono": "^3.11.9",
     "katnip": "^2.0.12"
   }
