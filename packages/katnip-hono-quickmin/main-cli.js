@@ -103,7 +103,13 @@ export async function onMigrate(hookEvent) {
 			break;
 
 		case "deploy:wrangler":
-			await runCommand(quickminBin,[...quickminArgs,"--driver","wrangler"],{passthrough: true});
+			let options={passthrough: true, env: {...process.env}};
+			if (hookEvent.cfToken)
+				options.env.CLOUDFLARE_API_TOKEN=hookEvent.cfToken;
+
+			//console.log(options);
+
+			await runCommand(quickminBin,[...quickminArgs,"--driver","wrangler"],options);
 			break;
 
 		default:

@@ -15,10 +15,14 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 async function onDeploy(hookEvent) {
 	switch (hookEvent.platform) {
 		case "wrangler":
+			let env={...process.env};
+			if (hookEvent.cfToken)
+				env.CLOUDFLARE_API_TOKEN=hookEvent.cfToken;
+
 	        await runCommand(
 	        	"wrangler",
 	        	["deploy"], 
-				{passthrough: true}
+				{passthrough: true, env: env}
 			);
 			break;
 
@@ -108,6 +112,8 @@ async function onEarlyDev(hookEvent) {
 }
 
 async function onEarlyDeploy(hookEvent) {
+	console.log("cfToken: "+hookEvent.cfToken);
+
 	if (!hookEvent.platform)
 		hookEvent.platform="wrangler";
 

@@ -1,7 +1,7 @@
 {
   "name": "katnip-rpc",
   "scripts": {},
-  "version": "1.0.2",
+  "version": "1.0.3",
   "main": "main-cli.js",
   "license": "MIT",
   "type": "module",
@@ -10,6 +10,6 @@
   ],
   "dependencies": {
     "fullstack-utils": "^1.0.8",
-    "katnip-hono": "^1.0.15"
+    "katnip-hono": "^1.0.16"
   }
 }
