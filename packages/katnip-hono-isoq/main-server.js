@@ -1,7 +1,7 @@
 import {HookEvent} from "katnip";
 
 async function onHonoMiddlewares(hookEvent) {
-	let isoqMiddleware=hookEvent.workerModules.isoqMiddleware;
+	let isoqMiddleware=hookEvent.workerModules.isoqMiddleware.default;
 	let app=hookEvent.app;
 
 	async function getProps() {
@@ -11,10 +11,12 @@ async function onHonoMiddlewares(hookEvent) {
 		return event.props;
 	}
 
-	app.use("*",isoqMiddleware.default({
-		localFetch: app.fetch,
-		props: getProps
-	}));
+	app.use("*",async c=>{
+		return await isoqMiddleware(c.req.raw,{
+		    localFetch: app.fetch,
+			props: getProps
+		});
+	});
 }
 
 export function registerHooks(hookRunner) {
