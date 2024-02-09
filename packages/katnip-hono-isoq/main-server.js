@@ -13,7 +13,8 @@ async function onHonoMiddlewares(hookEvent) {
 
 	app.use("*",async c=>{
 		return await isoqMiddleware(c.req.raw,{
-		    localFetch: app.fetch,
+		    localFetch: req=>app.fetch(req,c.env,c.executionCtx),
+//		    localFetch: app.fetch,
 			props: getProps
 		});
 	});
