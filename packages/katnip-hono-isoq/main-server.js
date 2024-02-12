@@ -11,10 +11,17 @@ async function onHonoMiddlewares(hookEvent) {
 		return event.props;
 	}
 
+	//console.log("here",hookEvent);
+
 	app.use("*",async c=>{
 		return await isoqMiddleware(c.req.raw,{
-		    localFetch: req=>app.fetch(req,c.env,c.executionCtx),
-//		    localFetch: app.fetch,
+		    localFetch: req=>{
+		    	if (hookEvent.platform=="wrangler")
+			    	return app.fetch(req,c.env,c.executionCtx)
+
+			    else
+			    	return app.fetch(req,c.env)
+		    },
 			props: getProps
 		});
 	});
