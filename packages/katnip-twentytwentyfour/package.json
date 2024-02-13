@@ -1,7 +1,7 @@
 {
   "name": "katnip-twentytwentyfour",
   "scripts": {},
-  "version": "1.0.37",
+  "version": "1.0.38",
   "main": "index.js",
   "license": "MIT",
   "type": "module",
@@ -10,7 +10,7 @@
   ],
   "dependencies": {
     "katnip-hono": "^1.0.16",
-    "katnip-hono-isoq": "^1.0.15",
+    "katnip-hono-isoq": "^1.0.16",
     "katnip-rpc": "^1.0.3",
     "katnip-hono-quickmin": "^1.0.19",
     "katnip-hono-static": "^1.0.6",

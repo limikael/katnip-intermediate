@@ -42,8 +42,16 @@ async function onBuild(hookEvent) {
 	fs.mkdirSync("node_modules/.katnip",{recursive: true});
 	fs.writeFileSync("node_modules/.katnip/main.jsx",source);
 
+	if (!hookEvent.platform)
+		throw new Error("Platform not set, strange...");
+
+	let sourcemap=false;
+	if (hookEvent.platform=="node")
+		sourcemap=true;
+
 	await bundler({
-		entryPoint: path.join(process.cwd(),"node_modules/.katnip/main.jsx")
+		entryPoint: path.join(process.cwd(),"node_modules/.katnip/main.jsx"),
+		sourcemap: sourcemap
 	});
 }
 
